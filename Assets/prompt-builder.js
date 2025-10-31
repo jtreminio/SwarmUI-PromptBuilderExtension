@@ -49,6 +49,7 @@ var Templates;
                    value="{{searchFilter}}"
                    id="pb-nav-search-input">
         </div>
+        <ul id="pb-nav-list"></ul>
     </div>
     <div class="pb-resize-handle" id="pb-resize-handle"></div>
     <div class="pb-content-panel">
@@ -902,8 +903,10 @@ class PromptBuilderApp {
     }
     renderNavigation() {
         const navPanel = document.getElementById('pb-nav-panel');
+        const navList = document.getElementById('pb-nav-list');
         const searchBox = navPanel.querySelector('.pb-nav-search-box');
         const searchInput = searchBox.querySelector('.pb-nav-search-input');
+        const previousScrollTop = navList.scrollTop;
         const shouldPreserveFocus = document.activeElement === searchInput;
         const cursorPosition = searchInput.selectionStart;
         let html = '';
@@ -925,10 +928,7 @@ class PromptBuilderApp {
                     .replaceAll('{{subgroups}}', subgroupsHtml);
             }
         }
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = Templates.groupNav.replaceAll('{{groups}}', html);
-        navPanel.innerHTML = '';
-        navPanel.appendChild(searchBox);
+        navList.innerHTML = html;
         const newSearchInput = searchBox.querySelector('.pb-nav-search-input');
         if (this.currentSelection) {
             const breadcrumb = this.currentSelection.path.join(' > ');
@@ -941,7 +941,10 @@ class PromptBuilderApp {
             newSearchInput.focus({ preventScroll: true });
             newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
         }
-        navPanel.appendChild(wrapper.firstChild);
+        navList.scrollTop = previousScrollTop;
+        requestAnimationFrame(() => {
+            navList.scrollTop = previousScrollTop;
+        });
         // Attach click listeners for expansion/collapse and selection
         navPanel.querySelectorAll('[data-group-path]').forEach(el => {
             el.addEventListener('click', (e) => {

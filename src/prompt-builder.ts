@@ -320,9 +320,11 @@ class PromptBuilderApp {
     }
 
     private renderNavigation(): void {
-        const navPanel = document.getElementById('pb-nav-panel');
-        const searchBox = navPanel.querySelector('.pb-nav-search-box') as HTMLElement;
-        const searchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
+		const navPanel = document.getElementById('pb-nav-panel');
+		const navList = document.getElementById('pb-nav-list') as HTMLElement;
+		const searchBox = navPanel.querySelector('.pb-nav-search-box') as HTMLElement;
+		const searchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
+		const previousScrollTop = navList.scrollTop;
         const shouldPreserveFocus = document.activeElement === searchInput;
         const cursorPosition = searchInput.selectionStart;
         let html = '';
@@ -348,11 +350,8 @@ class PromptBuilderApp {
             }
         }
 
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = Templates.groupNav.replaceAll('{{groups}}', html);
-        navPanel.innerHTML = '';
-        navPanel.appendChild(searchBox);
-        const newSearchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
+		navList.innerHTML = html;
+		const newSearchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
 
         if (this.currentSelection) {
             const breadcrumb = this.currentSelection.path.join(' > ');
@@ -366,7 +365,10 @@ class PromptBuilderApp {
             newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
         }
 
-        navPanel.appendChild(wrapper.firstChild!);
+        navList.scrollTop = previousScrollTop;
+        requestAnimationFrame(() => {
+            navList!.scrollTop = previousScrollTop;
+        });
 
         // Attach click listeners for expansion/collapse and selection
         navPanel.querySelectorAll('[data-group-path]').forEach(el => {
