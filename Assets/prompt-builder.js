@@ -292,21 +292,6 @@ const STYLES = `.pb-prompt-builder-container {
     color: var(--emphasis);
 }
 
-.pb-nav-expand-icon {
-    display: inline-block;
-    width: 16px;
-    font-size: 0.7em;
-    text-align: center;
-    flex-shrink: 0;
-    user-select: none;
-}
-
-.pb-nav-expand-spacer {
-    display: inline-block;
-    width: 16px;
-    flex-shrink: 0;
-}
-
 .pb-nav-label {
     flex: 1;
     user-select: none;
@@ -395,16 +380,6 @@ const STYLES = `.pb-prompt-builder-container {
     transform: none;
 }
 
-.pb-insert-button {
-    background: var(--emphasis);
-    color: var(--button-text);
-    border-color: var(--emphasis);
-}
-
-.pb-insert-button:hover {
-    background: color-mix(in srgb, var(--emphasis) 80%, white);
-}
-
 .pb-selected-tags {
     display: flex;
     flex-wrap: wrap;
@@ -486,7 +461,7 @@ const STYLES = `.pb-prompt-builder-container {
     cursor: pointer;
     transition: all 0.2s;
     font-size: 0.9em;
-    color: var(--emphasis-text);
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -555,12 +530,6 @@ const STYLES = `.pb-prompt-builder-container {
     font-size: 0.95em;
 }
 
-.pb-loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-soft);
-}
-
 .pb-error {
     background: var(--background-danger);
     border: 1px solid var(--red);
@@ -570,7 +539,6 @@ const STYLES = `.pb-prompt-builder-container {
     margin: 20px;
 }
 
-/* Settings Gear Button */
 .pb-settings-gear {
     position: absolute !important;
     left: 0 !important;
