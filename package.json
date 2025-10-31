@@ -1,0 +1,25 @@
+{
+  "name": "swarmui-promptbuilder-extension",
+  "version": "1.0.0",
+  "description": "A SwarmUI extension that provides an interactive tool for building prompts from categorized tag collections",
+  "author": "Juan Treminio",
+  "email": "jtreminio@gmail.com",
+  "github": "https://github.com/jtreminio/SwarmUI-PromptBuilderExtension",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "prebuild": "node build/generate-assets.js",
+    "build": "tsc",
+    "watch": "npm run prebuild && tsc --watch",
+    "clean": "rm -f Assets/prompt-builder.js Assets/prompt-builder.js.map src/generated-assets.ts"
+  },
+  "keywords": [
+    "swarmui",
+    "extension",
+    "prompt-builder"
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
+
