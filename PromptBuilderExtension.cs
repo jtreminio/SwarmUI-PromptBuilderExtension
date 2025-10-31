@@ -109,24 +109,17 @@ public class PromptBuilderExtension : Extension
 
         PromptRegion.RegisterCustomPrefix("pbprompt");
 
-        T2IParamInput.LateSpecialParameterHandlers.Add(userInput =>
+        T2IPromptHandling.PromptTagProcessors["pbprompt"] = (data, context) =>
         {
-            var prompt = userInput.InternalSet.Get(T2IParamTypes.Prompt);
-            
-            // Check if prompt contains <pbprompt>
-            if (prompt.Contains("<pbprompt>"))
+            var pbpromptTags = context.Input.Get(_pbPromptParam, "");
+
+            if (!string.IsNullOrWhiteSpace(pbpromptTags))
             {
-                // Get the comma-delimited tags from the pbprompt parameter
-                var pbpromptTags = userInput.InternalSet.Get(_pbPromptParam, "");
-                
-                if (!string.IsNullOrWhiteSpace(pbpromptTags))
-                {
-                    Logs.Debug($"PromptBuilder: Replacing <pbprompt> with tags: {pbpromptTags}");
-                    // Replace <pbprompt> with the actual tags
-                    prompt = prompt.Replace("<pbprompt>", pbpromptTags);
-                    userInput.InternalSet.Set(T2IParamTypes.Prompt, prompt);
-                }
+                Logs.Debug($"PromptBuilder: Replacing <pbprompt> with tags: {pbpromptTags}");
+                return pbpromptTags;
             }
-        });
+
+            return "";
+        };
     }
 }
