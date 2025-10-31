@@ -653,6 +653,10 @@ class PromptBuilderApp {
         this.renderSelectedTags();
         this.renderItems();
         this.updatePBPromptField();
+
+        if (this.settings.autoGenerate && this.selectedTags.length >= this.settings.autoGenerateThreshold) {
+            this.triggerGeneration();
+        }
     }
 
     private editTagAtIndex(index: number, newValue: string): void {
@@ -664,8 +668,8 @@ class PromptBuilderApp {
 
     // Find or create the hidden input field for pbprompt in the main window
     private updatePBPromptField(): void {
-        const targetDocument = this.getWindow().document;
-        let pbPromptInput = this.getInput('input_pbprompt');
+        const targetDocument = this.getMainDocument();
+        let pbPromptInput = targetDocument.getElementById('input_pbprompt') as HTMLInputElement | null;
 
         if (!pbPromptInput) {
             const newInput = targetDocument.createElement('input');
@@ -941,11 +945,8 @@ class PromptBuilderApp {
     }
 
     private triggerGeneration(): void {
-        if (this.selectedTags.length === 0) {
-            return;
-        }
-
-        const generateButton = this.getButton('alt_generate_button');
+        const mainDoc = this.getMainDocument();
+        const generateButton = mainDoc.getElementById('alt_generate_button') as HTMLButtonElement | null;
 
         if (generateButton) {
             const tagsString = this.selectedTags.join(', ');
@@ -993,12 +994,16 @@ class PromptBuilderApp {
         return window.opener || window;
     }
 
+    private getMainDocument(): Document {
+        return window.opener?.document || document;
+    }
+
     private getButton(buttonId: string): HTMLButtonElement {
-        return this.getWindow().document.getElementById(buttonId) as HTMLButtonElement;
+        return document.getElementById(buttonId) as HTMLButtonElement;
     }
 
     private getInput(inputId: string): HTMLInputElement {
-        return this.getWindow().document.getElementById(inputId) as HTMLInputElement;
+        return document.getElementById(inputId) as HTMLInputElement;
     }
 
     private log(message: string): void {

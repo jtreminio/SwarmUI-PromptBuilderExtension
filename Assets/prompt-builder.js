@@ -1136,6 +1136,9 @@ class PromptBuilderApp {
         this.renderSelectedTags();
         this.renderItems();
         this.updatePBPromptField();
+        if (this.settings.autoGenerate && this.selectedTags.length >= this.settings.autoGenerateThreshold) {
+            this.triggerGeneration();
+        }
     }
     editTagAtIndex(index, newValue) {
         this.selectedTags[index] = newValue;
@@ -1145,8 +1148,8 @@ class PromptBuilderApp {
     }
     // Find or create the hidden input field for pbprompt in the main window
     updatePBPromptField() {
-        const targetDocument = this.getWindow().document;
-        let pbPromptInput = this.getInput('input_pbprompt');
+        const targetDocument = this.getMainDocument();
+        let pbPromptInput = targetDocument.getElementById('input_pbprompt');
         if (!pbPromptInput) {
             const newInput = targetDocument.createElement('input');
             newInput.type = 'text';
@@ -1377,10 +1380,8 @@ class PromptBuilderApp {
         this.log('Cleared all tags');
     }
     triggerGeneration() {
-        if (this.selectedTags.length === 0) {
-            return;
-        }
-        const generateButton = this.getButton('alt_generate_button');
+        const mainDoc = this.getMainDocument();
+        const generateButton = mainDoc.getElementById('alt_generate_button');
         if (generateButton) {
             const tagsString = this.selectedTags.join(', ');
             this.log(`Triggering generation with tags: ${tagsString}`);
@@ -1415,11 +1416,14 @@ class PromptBuilderApp {
     getWindow() {
         return window.opener || window;
     }
+    getMainDocument() {
+        return window.opener?.document || document;
+    }
     getButton(buttonId) {
-        return this.getWindow().document.getElementById(buttonId);
+        return document.getElementById(buttonId);
     }
     getInput(inputId) {
-        return this.getWindow().document.getElementById(inputId);
+        return document.getElementById(inputId);
     }
     log(message) {
         if (this.settings.debugMode) {
