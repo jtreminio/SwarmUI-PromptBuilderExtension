@@ -141,7 +141,16 @@ class PromptBuilderApp {
         this.initializeResize();
         this.attachSearchListener();
         this.attachKeyboardListener();
-        this.attachSettingsListeners();
+
+        if (!isInPopup) {
+            this.attachSettingsListeners();
+        } else {
+            // Hide settings button in popup
+            const settingsWrapper = document.querySelector('.pb-settings-gear-wrapper') as HTMLElement;
+            if (settingsWrapper) {
+                settingsWrapper.style.display = 'none';
+            }
+        }
 
         document.getElementById('pb-copy-button')!.addEventListener('click', () => {
             this.copyTagsToClipboard();
@@ -867,14 +876,11 @@ class PromptBuilderTool {
     }
 }
 
-sessionReadyCallbacks.push(() => {
-    new PromptBuilderTool().register();
-});
-
 // Check if we're in a popup window and need to initialize
 if (window.opener !== null) {
+    // We're in a popup window - set up the popup initialization function
     window.promptBuilderPopupInit = function (savedState: PromptBuilderState) {
-        const container = document.getElementById('popup-app')!;
+        const container = document.getElementById('pb-popup-app')!;
         const app = new PromptBuilderApp(container);
 
         if (savedState) {
@@ -886,9 +892,18 @@ if (window.opener !== null) {
         app.init();
         console.log('PromptBuilder: Initialized in popup window');
     };
+} else if (typeof sessionReadyCallbacks !== 'undefined') {
+    // We're in the main SwarmUI context - register as a tool
+    sessionReadyCallbacks.push(() => {
+        new PromptBuilderTool().register();
+    });
+
+    // Register the tab completion
+    if (typeof promptTabComplete !== 'undefined') {
+        promptTabComplete.registerPrefix('pbprompt', 'Placeholder for the prompt builder', (_prefix) => {
+            return [];
+        }, true);
+    }
 }
 
-promptTabComplete.registerPrefix('pbprompt', 'Placeholder for the prompt builder', (_prefix) => {
-    return [];
-}, true);
 

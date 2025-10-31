@@ -77,48 +77,63 @@ var Templates;
     Templates.popoutButton = `<button class="pb-copy-button" id="pb-popout-button" title="Pop out to new window">⧉</button>`;
     Templates.popupWindow = `<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Prompt Builder</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        #pb-popup-app {
-            width: 100vw;
-            height: 100vh;
-        }
-        .pb-prompt-builder-container {
-            height: 100vh !important;
-            max-height: none !important;
-        }
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+      }
+      #pb-popup-app {
+        width: 100vw;
+        height: 100vh;
+      }
+      .pb-prompt-builder-container {
+        height: 100vh !important;
+        max-height: none !important;
+      }
     </style>
     {{stylesheets}}
-    <link rel="stylesheet" href="/ExtensionFile/PromptBuilderExtension/Assets/prompt-builder.css?vary={{timestamp}}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="/ExtensionFile/PromptBuilderExtension/Assets/prompt-builder.css?vary={{timestamp}}"
+    />
+  </head>
+  <body>
     <div id="pb-popup-app"></div>
     <script>
-        // Store state to restore after script loads
-        window.promptBuilderState = {{state}};
-        
-        // Make parent window functions available
-        window.genericRequest = function(...args) {
-            return window.opener.genericRequest(...args);
-        };
+      // Store state to restore after script loads
+      window.promptBuilderState = {{state}};
+
+      // Make parent window functions available
+      window.genericRequest = function(...args) {
+          return window.opener.genericRequest(...args);
+      };
+
+      // Expose SwarmUI functions from parent window
+      if (window.opener.doPopover) {
+          window.doPopover = function(...args) {
+              return window.opener.doPopover(...args);
+          };
+      }
+
+      if (window.opener.AdvancedPopover) {
+          window.AdvancedPopover = window.opener.AdvancedPopover;
+      }
     </script>
     <script src="/ExtensionFile/PromptBuilderExtension/Assets/prompt-builder.js?vary={{timestamp}}"></script>
     <script>
-        // After the script loads, initialize with saved state
-        window.addEventListener('load', () => {
-            if (window.promptBuilderPopupInit) {
-                window.promptBuilderPopupInit(window.promptBuilderState);
-            }
-        });
+      // After the script loads, initialize with saved state
+      window.addEventListener("load", () => {
+        if (window.promptBuilderPopupInit) {
+          window.promptBuilderPopupInit(window.promptBuilderState);
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
 `;
     Templates.settingsModal = `<div class="sui-popover sui_popover_model" id="popover_pb_settings">
@@ -566,6 +581,7 @@ const STYLES = `.pb-prompt-builder-container {
     width: 0;
     height: 0;
     align-self: flex-start;
+    margin-right: 20px;
 }
 
 /* Settings Popover */
@@ -733,7 +749,16 @@ class PromptBuilderApp {
         this.initializeResize();
         this.attachSearchListener();
         this.attachKeyboardListener();
-        this.attachSettingsListeners();
+        if (!isInPopup) {
+            this.attachSettingsListeners();
+        }
+        else {
+            // Hide settings button in popup
+            const settingsWrapper = document.querySelector('.pb-settings-gear-wrapper');
+            if (settingsWrapper) {
+                settingsWrapper.style.display = 'none';
+            }
+        }
         document.getElementById('pb-copy-button').addEventListener('click', () => {
             this.copyTagsToClipboard();
         });
@@ -1335,13 +1360,11 @@ class PromptBuilderTool {
         });
     }
 }
-sessionReadyCallbacks.push(() => {
-    new PromptBuilderTool().register();
-});
 // Check if we're in a popup window and need to initialize
 if (window.opener !== null) {
+    // We're in a popup window - set up the popup initialization function
     window.promptBuilderPopupInit = function (savedState) {
-        const container = document.getElementById('popup-app');
+        const container = document.getElementById('pb-popup-app');
         const app = new PromptBuilderApp(container);
         if (savedState) {
             app['selectedTags'] = savedState.selectedTags || [];
@@ -1352,7 +1375,16 @@ if (window.opener !== null) {
         console.log('PromptBuilder: Initialized in popup window');
     };
 }
-promptTabComplete.registerPrefix('pbprompt', 'Placeholder for the prompt builder', (_prefix) => {
-    return [];
-}, true);
+else if (typeof sessionReadyCallbacks !== 'undefined') {
+    // We're in the main SwarmUI context - register as a tool
+    sessionReadyCallbacks.push(() => {
+        new PromptBuilderTool().register();
+    });
+    // Register the tab completion
+    if (typeof promptTabComplete !== 'undefined') {
+        promptTabComplete.registerPrefix('pbprompt', 'Placeholder for the prompt builder', (_prefix) => {
+            return [];
+        }, true);
+    }
+}
 //# sourceMappingURL=prompt-builder.js.map
