@@ -673,6 +673,22 @@ class PromptBuilderApp {
         pbPromptInput.value = tagsString;
         pbPromptInput.dispatchEvent(new Event('input', { bubbles: true }));
         this.log(`Updated input_pbprompt to: ${tagsString}`);
+
+        // Sync state back to the parent window if we're in a popup
+        if (window.opener) {
+            try {
+                window.opener.postMessage({
+                    type: 'PB_SYNC_STATE',
+                    payload: {
+                        selectedTags: [...this.selectedTags],
+                        expandedGroups: Array.from(this.expandedGroups),
+                        currentSelection: this.currentSelection
+                    }
+                }, '*');
+            } catch (e) {
+                console.error('PromptBuilder: Failed to postMessage to parent', e);
+            }
+        }
     }
 
     private renderSelectedTags(): void {
@@ -986,6 +1002,7 @@ class PromptBuilderTool {
         this.mainDiv.addEventListener('tool-opened', () => {
             if (!this.app) {
                 this.app = new PromptBuilderApp(this.mainDiv);
+                (window as any)['promptBuilderApp'] = this.app;
                 this.app.init();
             }
         });
@@ -1005,6 +1022,7 @@ if (window.opener !== null) {
             app['currentSelection'] = savedState.currentSelection || null;
         }
 
+        (window as any)['promptBuilderApp'] = app;
         app.init();
         console.log('PromptBuilder: Initialized in popup window');
     };
@@ -1020,6 +1038,29 @@ if (window.opener !== null) {
             return [];
         }, true);
     }
+
+    // Listen for popup state sync messages
+    window.addEventListener('message', (event: MessageEvent) => {
+        const data: any = (event && (event as any).data) || null;
+        if (!data || data.type !== 'PB_SYNC_STATE') {
+            return;
+        }
+
+        const app: any = (window as any)['promptBuilderApp'];
+        if (!app) {
+            return;
+        }
+
+        const payload = data.payload || {};
+        app['selectedTags'] = Array.isArray(payload.selectedTags) ? [...payload.selectedTags] : [];
+        app['expandedGroups'] = new Set(payload.expandedGroups || []);
+        app['currentSelection'] = payload.currentSelection || null;
+
+        // Re-render UI and update hidden field
+        app['renderSelectedTags']();
+        app['renderItems']();
+        app['updatePBPromptField']();
+    });
 }
 
 
