@@ -152,20 +152,20 @@ class PromptBuilderApp {
             }
         }
 
-        document.getElementById('pb-copy-button')!.addEventListener('click', () => {
+        this.getButton('pb-copy-button').addEventListener('click', () => {
             this.copyTagsToClipboard();
         });
 
-        document.getElementById('pb-clear-button')!.addEventListener('click', () => {
+        this.getButton('pb-clear-button').addEventListener('click', () => {
             this.clearAllTags();
         });
 
-        document.getElementById('pb-retry-button')!.addEventListener('click', () => {
+        this.getButton('pb-retry-button').addEventListener('click', () => {
             this.triggerGeneration();
         });
 
         if (!isInPopup) {
-            document.getElementById('pb-popout-button')!.addEventListener('click', () => {
+            this.getButton('pb-popout-button').addEventListener('click', () => {
                 this.popOutToWindow();
             });
         }
@@ -208,7 +208,7 @@ class PromptBuilderApp {
     }
 
     private attachSettingsListeners(): void {
-        const settingsButton = document.getElementById('pb-settings-button');
+        const settingsButton = this.getButton('pb-settings-button');
         const popover = document.getElementById('popover_pb_settings');
 
         if (!settingsButton || !popover) {
@@ -228,10 +228,10 @@ class PromptBuilderApp {
         this.populateSettingsPopover();
 
         // Auto-save when any setting changes
-        const autoGenerateCheckbox = document.getElementById('pb-setting-autogenerate') as HTMLInputElement;
-        const thresholdInput = document.getElementById('pb-setting-autogenerate-threshold') as HTMLInputElement;
-        const danbooruCheckbox = document.getElementById('pb-setting-danbooru-links') as HTMLInputElement;
-        const debugCheckbox = document.getElementById('pb-setting-debug-mode') as HTMLInputElement;
+        const autoGenerateCheckbox = this.getInput('pb-setting-autogenerate');
+        const thresholdInput = this.getInput('pb-setting-autogenerate-threshold');
+        const danbooruCheckbox = this.getInput('pb-setting-danbooru-links');
+        const debugCheckbox = this.getInput('pb-setting-debug-mode');
 
         autoGenerateCheckbox?.addEventListener('change', () => this.saveSettingsFromPopover());
         thresholdInput?.addEventListener('change', () => this.saveSettingsFromPopover());
@@ -240,22 +240,33 @@ class PromptBuilderApp {
     }
 
     private populateSettingsPopover(): void {
-        const autoGenerateCheckbox = document.getElementById('pb-setting-autogenerate') as HTMLInputElement;
-        const thresholdInput = document.getElementById('pb-setting-autogenerate-threshold') as HTMLInputElement;
-        const danbooruCheckbox = document.getElementById('pb-setting-danbooru-links') as HTMLInputElement;
-        const debugCheckbox = document.getElementById('pb-setting-debug-mode') as HTMLInputElement;
+        const autoGenerateCheckbox = this.getInput('pb-setting-autogenerate');
+        const thresholdInput = this.getInput('pb-setting-autogenerate-threshold');
+        const danbooruCheckbox = this.getInput('pb-setting-danbooru-links');
+        const debugCheckbox = this.getInput('pb-setting-debug-mode');
 
-        if (autoGenerateCheckbox) autoGenerateCheckbox.checked = this.settings.autoGenerate;
-        if (thresholdInput) thresholdInput.value = String(this.settings.autoGenerateThreshold);
-        if (danbooruCheckbox) danbooruCheckbox.checked = this.settings.danbooruLinks;
-        if (debugCheckbox) debugCheckbox.checked = this.settings.debugMode;
+        if (autoGenerateCheckbox) {
+            autoGenerateCheckbox.checked = this.settings.autoGenerate;
+        }
+
+        if (thresholdInput) {
+            thresholdInput.value = String(this.settings.autoGenerateThreshold);
+        }
+
+        if (danbooruCheckbox) {
+            danbooruCheckbox.checked = this.settings.danbooruLinks;
+        }
+
+        if (debugCheckbox) {
+            debugCheckbox.checked = this.settings.debugMode;
+        }
     }
 
     private saveSettingsFromPopover(): void {
-        const autoGenerateCheckbox = document.getElementById('pb-setting-autogenerate') as HTMLInputElement;
-        const thresholdInput = document.getElementById('pb-setting-autogenerate-threshold') as HTMLInputElement;
-        const danbooruCheckbox = document.getElementById('pb-setting-danbooru-links') as HTMLInputElement;
-        const debugCheckbox = document.getElementById('pb-setting-debug-mode') as HTMLInputElement;
+        const autoGenerateCheckbox = this.getInput('pb-setting-autogenerate');
+        const thresholdInput = this.getInput('pb-setting-autogenerate-threshold');
+        const danbooruCheckbox = this.getInput('pb-setting-danbooru-links');
+        const debugCheckbox = this.getInput('pb-setting-debug-mode');
 
         const previousDanbooruLinks = this.settings.danbooruLinks;
 
@@ -275,7 +286,7 @@ class PromptBuilderApp {
     }
 
     private attachSearchListener(): void {
-        const searchInput = document.getElementById('pb-nav-search-input') as HTMLInputElement;
+        const searchInput = this.getInput('pb-nav-search-input');
         searchInput.addEventListener('input', (e: Event) => {
             this.searchFilter = (e.target as HTMLInputElement).value.toLowerCase();
             this.renderItems();
@@ -403,7 +414,7 @@ class PromptBuilderApp {
                 // If this node has only subgroups (no direct items), auto-select the first subgroup
                 if (this.nodeHasChildren(path) && !this.nodeHasDirectItems(path)) {
                     const firstChild = this.getFirstChildPath(path);
-                    
+
                     if (firstChild) {
                         this.selectPath(firstChild);
                         return;
@@ -654,8 +665,8 @@ class PromptBuilderApp {
     // Find or create the hidden input field for pbprompt in the main window
     private updatePBPromptField(): void {
         const targetDocument = this.getWindow().document;
+        let pbPromptInput = this.getInput('input_pbprompt');
 
-        let pbPromptInput = targetDocument.getElementById('input_pbprompt') as HTMLInputElement | null;
         if (!pbPromptInput) {
             const newInput = targetDocument.createElement('input');
             newInput.type = 'text';
@@ -906,7 +917,7 @@ class PromptBuilderApp {
 
         try {
             await navigator.clipboard.writeText(this.selectedTags.join(', '));
-            const button = this.getButton(document, 'pb-copy-button');
+            const button = this.getButton('pb-copy-button');
             const originalText = button.innerHTML;
             button.innerHTML = '✓';
             button.disabled = true;
@@ -934,7 +945,7 @@ class PromptBuilderApp {
             return;
         }
 
-        const generateButton = this.getButton(this.getWindow().document, 'alt_generate_button');
+        const generateButton = this.getButton('alt_generate_button');
 
         if (generateButton) {
             const tagsString = this.selectedTags.join(', ');
@@ -982,8 +993,12 @@ class PromptBuilderApp {
         return window.opener || window;
     }
 
-    private getButton(target: Document, buttonId: string): HTMLButtonElement {
-        return target.getElementById(buttonId) as HTMLButtonElement;
+    private getButton(buttonId: string): HTMLButtonElement {
+        return this.getWindow().document.getElementById(buttonId) as HTMLButtonElement;
+    }
+
+    private getInput(inputId: string): HTMLInputElement {
+        return this.getWindow().document.getElementById(inputId) as HTMLInputElement;
     }
 
     private log(message: string): void {

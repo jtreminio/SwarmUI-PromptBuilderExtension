@@ -57,9 +57,9 @@ var Templates;
             <div class="pb-settings-gear-wrapper">
                 <div class="batch-gear-button pb-settings-gear" id="pb-settings-button" title="Settings">&#9881;</div>
             </div>
-            <button class="pb-copy-button" id="pb-copy-button" title="Copy to clipboard">⿻</button>
-            <button class="pb-copy-button" id="pb-clear-button" title="Clear all tags">✕</button>
-            <button class="pb-copy-button" id="pb-retry-button" title="Retry generation">↻</button>
+            <button class="pb-action-button" id="pb-copy-button" title="Copy to clipboard">⿻</button>
+            <button class="pb-action-button" id="pb-clear-button" title="Clear all tags">✕</button>
+            <button class="pb-action-button" id="pb-retry-button" title="Retry generation">↻</button>
             {{popoutButton}}
             <div class="pb-selected-tags" id="pb-selected-tags"></div>
         </div>
@@ -75,7 +75,7 @@ var Templates;
 </div>
 `;
     Templates.noTagsSelected = `<span class="text-muted">No tags selected</span>`;
-    Templates.popoutButton = `<button class="pb-copy-button" id="pb-popout-button" title="Pop out to new window">⧉</button>`;
+    Templates.popoutButton = `<button class="pb-action-button" id="pb-popout-button" title="Pop out to new window">⧉</button>`;
     Templates.popupWindow = `<!DOCTYPE html>
 <html>
   <head>
@@ -362,7 +362,7 @@ const STYLES = `.pb-prompt-builder-container {
     align-items: center;
 }
 
-.pb-copy-button, .pb-insert-button {
+.pb-action-button {
     padding: 8px 14px;
     background: var(--button-background);
     color: var(--button-text);
@@ -379,17 +379,17 @@ const STYLES = `.pb-prompt-builder-container {
     flex-shrink: 0;
 }
 
-.pb-copy-button:hover, .pb-insert-button:hover {
+.pb-action-button:hover {
     background: var(--button-background-hover);
     color: var(--button-foreground-hover);
     transform: translateY(-1px);
 }
 
-.pb-copy-button:active, .pb-insert-button:active {
+.pb-action-button:active {
     transform: translateY(0);
 }
 
-.pb-copy-button:disabled, .pb-insert-button:disabled {
+.pb-action-button:disabled {
     background: var(--backend-running);
     cursor: default;
     transform: none;
@@ -417,7 +417,7 @@ const STYLES = `.pb-prompt-builder-container {
     align-items: center;
     padding: 4px 8px;
     background: var(--emphasis);
-    color: var(--button-text);
+    color: var(--emphasis-text);
     border-radius: 16px;
     font-size: 0.9em;
     gap: 6px;
@@ -486,7 +486,7 @@ const STYLES = `.pb-prompt-builder-container {
     cursor: pointer;
     transition: all 0.2s;
     font-size: 0.9em;
-    color: var(--text);
+    color: var(--emphasis-text);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -502,7 +502,7 @@ const STYLES = `.pb-prompt-builder-container {
 
 .pb-item-card.selected {
     background: var(--emphasis);
-    color: var(--button-text);
+    color: var(--emphasis-text);
     border-color: var(--emphasis);
 }
 
@@ -760,17 +760,17 @@ class PromptBuilderApp {
                 settingsWrapper.style.display = 'none';
             }
         }
-        document.getElementById('pb-copy-button').addEventListener('click', () => {
+        this.getButton('pb-copy-button').addEventListener('click', () => {
             this.copyTagsToClipboard();
         });
-        document.getElementById('pb-clear-button').addEventListener('click', () => {
+        this.getButton('pb-clear-button').addEventListener('click', () => {
             this.clearAllTags();
         });
-        document.getElementById('pb-retry-button').addEventListener('click', () => {
+        this.getButton('pb-retry-button').addEventListener('click', () => {
             this.triggerGeneration();
         });
         if (!isInPopup) {
-            document.getElementById('pb-popout-button').addEventListener('click', () => {
+            this.getButton('pb-popout-button').addEventListener('click', () => {
                 this.popOutToWindow();
             });
         }
@@ -806,7 +806,7 @@ class PromptBuilderApp {
         this.keyboardListenerAttached = true;
     }
     attachSettingsListeners() {
-        const settingsButton = document.getElementById('pb-settings-button');
+        const settingsButton = this.getButton('pb-settings-button');
         const popover = document.getElementById('popover_pb_settings');
         if (!settingsButton || !popover) {
             return;
@@ -822,34 +822,38 @@ class PromptBuilderApp {
         // Populate initial values
         this.populateSettingsPopover();
         // Auto-save when any setting changes
-        const autoGenerateCheckbox = document.getElementById('pb-setting-autogenerate');
-        const thresholdInput = document.getElementById('pb-setting-autogenerate-threshold');
-        const danbooruCheckbox = document.getElementById('pb-setting-danbooru-links');
-        const debugCheckbox = document.getElementById('pb-setting-debug-mode');
+        const autoGenerateCheckbox = this.getInput('pb-setting-autogenerate');
+        const thresholdInput = this.getInput('pb-setting-autogenerate-threshold');
+        const danbooruCheckbox = this.getInput('pb-setting-danbooru-links');
+        const debugCheckbox = this.getInput('pb-setting-debug-mode');
         autoGenerateCheckbox?.addEventListener('change', () => this.saveSettingsFromPopover());
         thresholdInput?.addEventListener('change', () => this.saveSettingsFromPopover());
         danbooruCheckbox?.addEventListener('change', () => this.saveSettingsFromPopover());
         debugCheckbox?.addEventListener('change', () => this.saveSettingsFromPopover());
     }
     populateSettingsPopover() {
-        const autoGenerateCheckbox = document.getElementById('pb-setting-autogenerate');
-        const thresholdInput = document.getElementById('pb-setting-autogenerate-threshold');
-        const danbooruCheckbox = document.getElementById('pb-setting-danbooru-links');
-        const debugCheckbox = document.getElementById('pb-setting-debug-mode');
-        if (autoGenerateCheckbox)
+        const autoGenerateCheckbox = this.getInput('pb-setting-autogenerate');
+        const thresholdInput = this.getInput('pb-setting-autogenerate-threshold');
+        const danbooruCheckbox = this.getInput('pb-setting-danbooru-links');
+        const debugCheckbox = this.getInput('pb-setting-debug-mode');
+        if (autoGenerateCheckbox) {
             autoGenerateCheckbox.checked = this.settings.autoGenerate;
-        if (thresholdInput)
+        }
+        if (thresholdInput) {
             thresholdInput.value = String(this.settings.autoGenerateThreshold);
-        if (danbooruCheckbox)
+        }
+        if (danbooruCheckbox) {
             danbooruCheckbox.checked = this.settings.danbooruLinks;
-        if (debugCheckbox)
+        }
+        if (debugCheckbox) {
             debugCheckbox.checked = this.settings.debugMode;
+        }
     }
     saveSettingsFromPopover() {
-        const autoGenerateCheckbox = document.getElementById('pb-setting-autogenerate');
-        const thresholdInput = document.getElementById('pb-setting-autogenerate-threshold');
-        const danbooruCheckbox = document.getElementById('pb-setting-danbooru-links');
-        const debugCheckbox = document.getElementById('pb-setting-debug-mode');
+        const autoGenerateCheckbox = this.getInput('pb-setting-autogenerate');
+        const thresholdInput = this.getInput('pb-setting-autogenerate-threshold');
+        const danbooruCheckbox = this.getInput('pb-setting-danbooru-links');
+        const debugCheckbox = this.getInput('pb-setting-debug-mode');
         const previousDanbooruLinks = this.settings.danbooruLinks;
         this.settings = {
             autoGenerate: autoGenerateCheckbox?.checked ?? this.DEFAULT_SETTINGS.autoGenerate,
@@ -864,7 +868,7 @@ class PromptBuilderApp {
         this.log('Settings saved');
     }
     attachSearchListener() {
-        const searchInput = document.getElementById('pb-nav-search-input');
+        const searchInput = this.getInput('pb-nav-search-input');
         searchInput.addEventListener('input', (e) => {
             this.searchFilter = e.target.value.toLowerCase();
             this.renderItems();
@@ -1174,7 +1178,7 @@ class PromptBuilderApp {
     // Find or create the hidden input field for pbprompt in the main window
     updatePBPromptField() {
         const targetDocument = this.getWindow().document;
-        let pbPromptInput = targetDocument.getElementById('input_pbprompt');
+        let pbPromptInput = this.getInput('input_pbprompt');
         if (!pbPromptInput) {
             const newInput = targetDocument.createElement('input');
             newInput.type = 'text';
@@ -1384,7 +1388,7 @@ class PromptBuilderApp {
         }
         try {
             await navigator.clipboard.writeText(this.selectedTags.join(', '));
-            const button = this.getButton(document, 'pb-copy-button');
+            const button = this.getButton('pb-copy-button');
             const originalText = button.innerHTML;
             button.innerHTML = '✓';
             button.disabled = true;
@@ -1408,7 +1412,7 @@ class PromptBuilderApp {
         if (this.selectedTags.length === 0) {
             return;
         }
-        const generateButton = this.getButton(this.getWindow().document, 'alt_generate_button');
+        const generateButton = this.getButton('alt_generate_button');
         if (generateButton) {
             const tagsString = this.selectedTags.join(', ');
             this.log(`Triggering generation with tags: ${tagsString}`);
@@ -1443,8 +1447,11 @@ class PromptBuilderApp {
     getWindow() {
         return window.opener || window;
     }
-    getButton(target, buttonId) {
-        return target.getElementById(buttonId);
+    getButton(buttonId) {
+        return this.getWindow().document.getElementById(buttonId);
+    }
+    getInput(inputId) {
+        return this.getWindow().document.getElementById(inputId);
     }
     log(message) {
         if (this.settings.debugMode) {

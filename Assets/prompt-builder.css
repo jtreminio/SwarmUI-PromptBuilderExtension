@@ -163,7 +163,7 @@
     align-items: center;
 }
 
-.pb-copy-button, .pb-insert-button {
+.pb-action-button {
     padding: 8px 14px;
     background: var(--button-background);
     color: var(--button-text);
@@ -180,17 +180,17 @@
     flex-shrink: 0;
 }
 
-.pb-copy-button:hover, .pb-insert-button:hover {
+.pb-action-button:hover {
     background: var(--button-background-hover);
     color: var(--button-foreground-hover);
     transform: translateY(-1px);
 }
 
-.pb-copy-button:active, .pb-insert-button:active {
+.pb-action-button:active {
     transform: translateY(0);
 }
 
-.pb-copy-button:disabled, .pb-insert-button:disabled {
+.pb-action-button:disabled {
     background: var(--backend-running);
     cursor: default;
     transform: none;
@@ -218,7 +218,7 @@
     align-items: center;
     padding: 4px 8px;
     background: var(--emphasis);
-    color: var(--button-text);
+    color: var(--emphasis-text);
     border-radius: 16px;
     font-size: 0.9em;
     gap: 6px;
@@ -287,7 +287,7 @@
     cursor: pointer;
     transition: all 0.2s;
     font-size: 0.9em;
-    color: var(--text);
+    color: var(--emphasis-text);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -303,7 +303,7 @@
 
 .pb-item-card.selected {
     background: var(--emphasis);
-    color: var(--button-text);
+    color: var(--emphasis-text);
     border-color: var(--emphasis);
 }
 
