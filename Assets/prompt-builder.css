@@ -135,12 +135,12 @@
     color: var(--emphasis);
 }
 
-.pb-nav-subgroup-nested {
+.pb-nav-subgroup.pb-nav-subgroup-nested {
     padding-left: 45px;
     font-size: 0.85em;
 }
 
-.pb-nav-subgroup-nested-2 {
+.pb-nav-subgroup.pb-nav-subgroup-nested-2 {
     padding-left: 60px;
     font-size: 0.85em;
 }

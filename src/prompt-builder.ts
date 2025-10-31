@@ -362,7 +362,7 @@ class PromptBuilderApp {
         }
 
         if (shouldPreserveFocus) {
-            newSearchInput.focus();
+            newSearchInput.focus({ preventScroll: true });
             newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
         }
 
@@ -371,6 +371,7 @@ class PromptBuilderApp {
         // Attach click listeners for expansion/collapse and selection
         navPanel.querySelectorAll('[data-group-path]').forEach(el => {
             el.addEventListener('click', (e: Event) => {
+                e.preventDefault();
                 e.stopPropagation();
                 const element = el as HTMLElement;
                 const groupPath = element.dataset.groupPath!;
@@ -401,6 +402,7 @@ class PromptBuilderApp {
 
         navPanel.querySelectorAll('[data-path]:not([data-group-path])').forEach(el => {
             el.addEventListener('click', (e: Event) => {
+                e.preventDefault();
                 e.stopPropagation();
                 const element = el as HTMLElement;
                 const path = element.dataset.path!.split('>');
@@ -435,7 +437,7 @@ class PromptBuilderApp {
                 .replaceAll('{{fullPath}}', fullPath)
                 .replaceAll('{{parentPath}}', parentPath)
                 .replaceAll('{{groupPath}}', hasChildren ? fullPath : '')
-                .replaceAll('{{spacer}}', hasChildren ? `` : '<span class="pb-nav-expand-spacer"></span>')
+                .replaceAll('{{spacer}}', '')
                 .replaceAll('{{subgroupName}}', subgroupName);
 
             if (subgroupData.hasChildren && isExpanded) {

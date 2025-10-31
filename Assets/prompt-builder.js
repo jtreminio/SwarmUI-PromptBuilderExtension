@@ -333,12 +333,12 @@ const STYLES = `.pb-prompt-builder-container {
     color: var(--emphasis);
 }
 
-.pb-nav-subgroup-nested {
+.pb-nav-subgroup.pb-nav-subgroup-nested {
     padding-left: 45px;
     font-size: 0.85em;
 }
 
-.pb-nav-subgroup-nested-2 {
+.pb-nav-subgroup.pb-nav-subgroup-nested-2 {
     padding-left: 60px;
     font-size: 0.85em;
 }
@@ -938,13 +938,14 @@ class PromptBuilderApp {
             newSearchInput.placeholder = 'Select a category first...';
         }
         if (shouldPreserveFocus) {
-            newSearchInput.focus();
+            newSearchInput.focus({ preventScroll: true });
             newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
         }
         navPanel.appendChild(wrapper.firstChild);
         // Attach click listeners for expansion/collapse and selection
         navPanel.querySelectorAll('[data-group-path]').forEach(el => {
             el.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 const element = el;
                 const groupPath = element.dataset.groupPath;
@@ -972,6 +973,7 @@ class PromptBuilderApp {
         });
         navPanel.querySelectorAll('[data-path]:not([data-group-path])').forEach(el => {
             el.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 const element = el;
                 const path = element.dataset.path.split('>');
@@ -998,7 +1000,7 @@ class PromptBuilderApp {
                 .replaceAll('{{fullPath}}', fullPath)
                 .replaceAll('{{parentPath}}', parentPath)
                 .replaceAll('{{groupPath}}', hasChildren ? fullPath : '')
-                .replaceAll('{{spacer}}', hasChildren ? `` : '<span class="pb-nav-expand-spacer"></span>')
+                .replaceAll('{{spacer}}', '')
                 .replaceAll('{{subgroupName}}', subgroupName);
             if (subgroupData.hasChildren && isExpanded) {
                 html += this.renderSubgroups(subgroupData.children, groupName, fullPath, depth + 1);
