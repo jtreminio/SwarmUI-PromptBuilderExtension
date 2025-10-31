@@ -2,6 +2,8 @@
 
 A SwarmUI extension that provides an interactive tool for building prompts from Danbooru tag collections.
 
+![Prompt Builder Extension](https://github.com/jtreminio/SwarmUI-PromptBuilderExtension/blob/main/Assets/logo.png?raw=true)
+
 ## Features
 
 - **Hierarchical Tag Browser**: Navigate through organized categories of tags
