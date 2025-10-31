@@ -420,6 +420,10 @@ const STYLES = `.pb-prompt-builder-container {
     padding-right: 8px;
 }
 
+.pb-tag-chip.pb-related-highlight {
+    box-shadow: 0 0 0 2px var(--toggle-background);
+}
+
 .pb-tag-chip-editing {
     padding: 2px 4px;
 }
@@ -1102,6 +1106,24 @@ class PromptBuilderApp {
             card.addEventListener('click', () => {
                 const value = card.dataset.value;
                 this.toggleTag(value);
+            });
+            card.addEventListener('mouseenter', () => {
+                const el = card;
+                if (!el.classList.contains('selected')) {
+                    return;
+                }
+                const value = el.dataset.value;
+                if (!value) {
+                    return;
+                }
+                document.querySelectorAll(`.pb-tag-chip[data-tag="${CSS.escape(value)}"]`).forEach(el => {
+                    el.classList.add('pb-related-highlight');
+                });
+            });
+            card.addEventListener('mouseleave', () => {
+                document.querySelectorAll('.pb-related-highlight').forEach(el => {
+                    el.classList.remove('pb-related-highlight');
+                });
             });
         });
     }

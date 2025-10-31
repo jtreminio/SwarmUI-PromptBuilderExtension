@@ -221,6 +221,10 @@
     padding-right: 8px;
 }
 
+.pb-tag-chip.pb-related-highlight {
+    box-shadow: 0 0 0 2px var(--toggle-background);
+}
+
 .pb-tag-chip-editing {
     padding: 2px 4px;
 }

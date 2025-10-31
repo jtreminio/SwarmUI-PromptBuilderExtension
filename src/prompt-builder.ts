@@ -615,6 +615,25 @@ class PromptBuilderApp {
                 const value = (card as HTMLElement).dataset.value;
                 this.toggleTag(value);
             });
+            card.addEventListener('mouseenter', () => {
+                const el = card as HTMLElement;
+                if (!el.classList.contains('selected')) {
+                    return;
+                }
+                const value = el.dataset.value;
+                if (!value) {
+                    return;
+                }
+
+                document.querySelectorAll(`.pb-tag-chip[data-tag="${CSS.escape(value)}"]`).forEach(el => {
+                    (el as HTMLElement).classList.add('pb-related-highlight');
+                });
+            });
+            card.addEventListener('mouseleave', () => {
+                document.querySelectorAll('.pb-related-highlight').forEach(el => {
+                    (el as HTMLElement).classList.remove('pb-related-highlight');
+                });
+            });
         });
     }
 
