@@ -107,8 +107,6 @@ public class PromptBuilderExtension : Extension
             OrderPriority: -10
         ));
 
-        PromptRegion.RegisterCustomPrefix("pbprompt");
-
         T2IPromptHandling.PromptTagProcessors["pbprompt"] = (data, context) =>
         {
             var pbpromptTags = context.Input.Get(_pbPromptParam, "");
