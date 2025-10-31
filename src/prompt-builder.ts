@@ -320,38 +320,40 @@ class PromptBuilderApp {
     }
 
     private renderNavigation(): void {
-		const navPanel = document.getElementById('pb-nav-panel');
-		const navList = document.getElementById('pb-nav-list') as HTMLElement;
-		const searchBox = navPanel.querySelector('.pb-nav-search-box') as HTMLElement;
-		const searchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
-		const previousScrollTop = navList.scrollTop;
+        const navPanel = document.getElementById('pb-nav-panel') as HTMLElement;
+        const navList = document.getElementById('pb-nav-list') as HTMLUListElement;
+        const searchBox = navPanel.querySelector('.pb-nav-search-box') as HTMLElement;
+        const searchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
+        const previousScrollTop = navList.scrollTop;
         const shouldPreserveFocus = document.activeElement === searchInput;
         const cursorPosition = searchInput.selectionStart;
         let html = '';
 
-        if (this.data) {
-            for (const [groupName, groupData] of Object.entries(this.data)) {
-                const groupPath = groupName;
-                const isExpanded = this.expandedGroups.has(groupPath);
-                const isActive = this.currentSelection &&
-                    this.currentSelection.path[0] === groupName &&
-                    this.currentSelection.path.length === 1;
-
-                let subgroupsHtml = '';
-                if (groupData.structure && isExpanded) {
-                    subgroupsHtml = this.renderSubgroups(groupData.structure, groupName, groupPath);
-                }
-
-                html += Templates.group
-                    .replaceAll('{{active}}', isActive ? 'active' : '')
-                    .replaceAll('{{groupName}}', groupName)
-                    .replaceAll('{{groupPath}}', groupPath)
-                    .replaceAll('{{subgroups}}', subgroupsHtml);
-            }
+        if (!this.data) {
+            return;
         }
 
-		navList.innerHTML = html;
-		const newSearchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
+        for (const [groupName, groupData] of Object.entries(this.data)) {
+            const groupPath = groupName;
+            const isExpanded = this.expandedGroups.has(groupPath);
+            const isActive = this.currentSelection &&
+                this.currentSelection.path[0] === groupName &&
+                this.currentSelection.path.length === 1;
+
+            let subgroupsHtml = '';
+            if (groupData.structure && isExpanded) {
+                subgroupsHtml = this.renderSubgroups(groupData.structure, groupName, groupPath);
+            }
+
+            html += Templates.group
+                .replaceAll('{{active}}', isActive ? 'active' : '')
+                .replaceAll('{{groupName}}', groupName)
+                .replaceAll('{{groupPath}}', groupPath)
+                .replaceAll('{{subgroups}}', subgroupsHtml);
+        }
+
+        navList.innerHTML = html;
+        const newSearchInput = searchBox.querySelector('.pb-nav-search-input') as HTMLInputElement;
 
         if (this.currentSelection) {
             const breadcrumb = this.currentSelection.path.join(' > ');
@@ -398,6 +400,16 @@ class PromptBuilderApp {
                     this.expandedGroups.add(groupPath);
                 }
 
+                // If this node has only subgroups (no direct items), auto-select the first subgroup
+                if (this.nodeHasChildren(path) && !this.nodeHasDirectItems(path)) {
+                    const firstChild = this.getFirstChildPath(path);
+                    
+                    if (firstChild) {
+                        this.selectPath(firstChild);
+                        return;
+                    }
+                }
+
                 this.selectPath(path);
             });
         });
@@ -411,6 +423,106 @@ class PromptBuilderApp {
                 this.selectPath(path);
             });
         });
+    }
+
+    private nodeHasChildren(path: string[]): boolean {
+        if (!path || path.length === 0) {
+            return false;
+        }
+
+        const root = this.data?.[path[0]];
+
+        if (!root) {
+            return false;
+        }
+
+        if (path.length === 1) {
+            const structure = root.structure;
+            return !!structure && Object.keys(structure).length > 0;
+        }
+
+        let node: StructureNode | undefined;
+        let children = root.structure;
+
+        for (let i = 1; i < path.length; i++) {
+            if (!children) {
+                return false;
+            }
+
+            node = children[path[i]];
+
+            if (!node) {
+                return false;
+            }
+
+            children = node.children;
+        }
+
+        return !!node?.hasChildren;
+    }
+
+    private nodeHasDirectItems(path: string[]): boolean {
+        if (!path || path.length === 0) {
+            return false;
+        }
+
+        const groupName = path[0];
+        const groupData = this.data?.[groupName];
+
+        if (!groupData) {
+            return false;
+        }
+
+        for (const item of groupData.items) {
+            if (item.path.length !== path.length) {
+                continue;
+            }
+
+            let matches = true;
+
+            for (let i = 0; i < path.length; i++) {
+                if (item.path[i] !== path[i]) {
+                    matches = false;
+                    break;
+                }
+            }
+
+            if (matches) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private getFirstChildPath(path: string[]): string[] | null {
+        const root = this.data?.[path[0]];
+
+        if (!root) {
+            return null;
+        }
+
+        let children = root.structure;
+
+        if (path.length > 1) {
+            for (let i = 1; i < path.length; i++) {
+                if (!children) return null;
+                const node = children[path[i]];
+                if (!node) return null;
+                children = node.children;
+            }
+        }
+        if (!children) {
+            return null;
+        }
+
+        const keys = Object.keys(children);
+
+        if (keys.length === 0) {
+            return null;
+        }
+
+        return [...path, keys[0]];
     }
 
     private renderSubgroups(
