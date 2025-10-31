@@ -1,19 +1,27 @@
 # Prompt Builder Extension
 
-A SwarmUI extension that provides an interactive tool for building prompts from Danbooru tag collections.
+A SwarmUI extension for Danbooru tag connoisseurs who definitely aren't making waifus.
 
-![Prompt Builder Extension](https://github.com/jtreminio/SwarmUI-PromptBuilderExtension/blob/main/Assets/logo.png?raw=true)
+![Prompt Builder Extension Logo](https://github.com/jtreminio/SwarmUI-PromptBuilderExtension/blob/main/Assets/logo.png?raw=true)
+
+Build your ideal anime girl (or suspiciously specific scenario) with the click of a button.
+Over 25,000 of the most popular Danbooru tags, neatly categorized and sorted by popularity.
+Because typing "1girl, blush, maid, sunset" by hand is for amateurs.
 
 ## Features
 
-- **Hierarchical Tag Browser**: Navigate through organized categories of tags
-- **Quick Tag Selection**: Click to select/deselect tags
-- **Drag and Drop Reordering**: Rearrange selected tags by dragging them
-- **Search Functionality**: Filter tags within each category
-- **Insert to Prompt**: Directly insert selected tags into the main prompt field using `<pbprompt>` placeholder
-- **Copy to Clipboard**: Copy selected tags to clipboard
-- **Pop-out Window**: Open the tool in a separate window for multi-monitor workflows
-- **Settings Panel**: Configure behavior with the settings button (⚙)
+- Browse tags by category and popularity
+- Click to add, drag to reorder
+- Insert directly into your prompt with `<pbprompt>`
+- Auto-gen images as you click buttons!
+- Tags link to Danbooru for your full research
+- Search tags by typing, like a caveman
+- Open in a pop-out window for full creative... efficiency
+- BUTTONS!
+
+Make your workflow faster, your tags cleaner, and your shame slightly more organized.
+
+![Prompt Builder Extension Screenshot](https://github.com/jtreminio/SwarmUI-PromptBuilderExtension/blob/main/Assets/screenshot.png?raw=true)
 
 ## Settings
 
@@ -37,20 +45,20 @@ Enables console logging for debugging purposes.
 
 The extension comes with the following tag categories:
 
-- **Background**: Background styles and elements
-- **Colors**: Color-related tags
-- **Image Composition**: Composition and framing tags
-- **Character**: Character attributes and features
-- **Locations**: Location and setting tags
-- **Sex**: Sex-related tags
-- **Creatures**: Creature and entity tags
-- **Design Elements**: Design and style elements
-- **Games**: Game-related tags
-- **Groups**: Group configurations
-- **Jobs**: Occupation and role tags
-- **Objects**: Object and item tags
-- **Plants**: Plant and flora tags
-- **Series**: Series and franchise tags
+- Background: Background styles and elements
+- Colors: Color-related
+- Image Composition: Composition and framing
+- Character: Character attributes and features
+- Locations: Location and setting
+- Sex: Your shame
+- Creatures: Creatures
+- Design Elements: Design and style elements
+- Games: Board Game, Video Games
+- Groups: Group configurations
+- Jobs: Occupation and role, and items
+- Objects: Object and items
+- Plants: Plant and flora
+- Series: Series and franchise
 
 ## Usage
 
@@ -62,14 +70,12 @@ The extension comes with the following tag categories:
 6. Use the `<pbprompt>` placeholder in your prompt field
 7. Selected tags will automatically replace `<pbprompt>` when generating
 
-### Using with Prompts
-
-Add `<pbprompt>` anywhere in your prompt:
+You must add `<pbprompt>` somewhere in your prompt:
 ```
 a beautiful landscape, <pbprompt>, high quality
 ```
 
-When you generate, it becomes:
+When you generate, the tags you've selected are automatically inserted into your prompt and it becomes:
 ```
 a beautiful landscape, mountain, sunset, vibrant colors, high quality
 ```
@@ -82,4 +88,4 @@ When hovering over a selected tag:
 
 ## License
 
-MIT
+[MIT](https://github.com/jtreminio/SwarmUI-PromptBuilderExtension/blob/main/LICENSE)
