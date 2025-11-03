@@ -19,6 +19,7 @@ public class PromptBuilderExtension : Extension
         { "Colors", "./data/colors.json" },
         { "Image Composition", "./data/image-composition.json" },
         { "Character", "./data/character.json" },
+        { "Lighting", "./data/lighting.json" },
         { "Locations", "./data/locations.json" },
         { "Sex", "./data/sex.json" },
         { "Creatures", "./data/creatures.json" },
