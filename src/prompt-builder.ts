@@ -614,6 +614,19 @@ class PromptBuilderApp {
                 const value = (card as HTMLElement).dataset.value;
                 this.toggleTag(value);
             });
+            card.addEventListener('contextmenu', (e: Event) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const el = card as HTMLElement;
+                const value = el.dataset.value;
+                if (!value) {
+                    return;
+                }
+                const index = this.selectedTags.indexOf(value);
+                if (index !== -1) {
+                    this.deleteTagAtIndex(index);
+                }
+            });
             card.addEventListener('mouseenter', () => {
                 const el = card as HTMLElement;
                 if (!el.classList.contains('selected')) {
