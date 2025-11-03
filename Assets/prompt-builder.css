@@ -383,3 +383,13 @@
     outline: none;
     border-color: var(--emphasis);
 }
+
+#pb-popup-app {
+    width: 100vw;
+    height: 100vh;
+}
+
+.pb-prompt-builder-container {
+    height: 100vh !important;
+    max-height: none !important;
+}

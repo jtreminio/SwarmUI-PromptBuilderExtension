@@ -134,7 +134,6 @@ class PromptBuilderApp {
 
         this.container.insertAdjacentHTML('beforeend', Templates.settingsModal);
 
-        injectStyles();
         this.renderNavigation();
         this.renderSelectedTags();
         this.renderItems();

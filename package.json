@@ -8,9 +8,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "prebuild": "node build/generate-assets.js",
-    "build": "tsc",
-    "watch": "npm run prebuild && tsc --watch",
+    "build": "npm run clean && node build/generate-assets.js && tsc",
     "clean": "rm -f Assets/prompt-builder.js Assets/prompt-builder.js.map src/generated-assets.ts"
   },
   "keywords": [
